@@ -335,20 +335,26 @@ int ish_stat(const char *path, void *stat_result)
             register long result asm("x0");
 
             __asm__ __volatile__ (
-                "mov x8, #0x6a\n\t"
-                "svc #0x0"
-                : "=r" (result)
-                : : "x8"
+              "mov x0, #-100\n\t"
+              "mov x1, $0\n\t"
+              "mov x2, $1\n\t"
+              "mov x8, #0x6a\n\t"
+              "svc #0x0"
+              : "=r" (result)
+              : : "x8", "x0", "x1", "x2"
             );
             return result;
         #elif defined(__arm__)
             register long result asm("r0");
 
             __asm__ __volatile__ (
+                "mov r0, #-100\n\t"
+                "mov r1, $0\n\t"
+                "mov r2, $1\n\t"
                 "mov r7, #0x6a\n\t"
                 "swi #0x0"
                 : "=r" (result)
-                : : "r7"
+                : : "r7", "r0", "r1", "r2"
             );
             return result;
         #endif
@@ -397,20 +403,26 @@ int ish_open(const char *path, int flags)
             register long result asm("x0");
 
             __asm__ __volatile__ (
+                "mov x0, $-100\n\t"
+                "mov x1, $0\n\t"
+                "mov x2, $1\n\t"
                 "mov x8, #0x5\n\t"
                 "svc #0x0"
                 : "=r" (result)
-                : : "x8"
+                : : "x8", "x0", "x1", "x2"
             );
             return result;
         #elif defined(__arm__)
             register long result asm("r0");
 
             __asm__ __volatile__ (
+                "mov r0, $-100\n\t"
+                "mov r1, $0\n\t"
+                "mov r2, $1\n\t"
                 "mov r7, #0x5\n\t"
                 "swi #0x0"
                 : "=r" (result)
-                : : "r7"
+                : : "r7", "r0", "r1", "r2"
             );
             return result;
         #endif
@@ -463,25 +475,7 @@ int ish_creat(const char *path, unsigned int mode)
                     0x0200  | 0x0400  | 0x0001 = 0x601
         */
         #if defined(__aarch64__)
-            register long result asm("x0");
-
-            __asm__ __volatile__ (
-                "mov x8, #0x8\n\t"
-                "svc #0x0"
-                : "=r" (result)
-                : : "x8"
-            );
-            return result;
         #elif defined(__arm__)
-            register long result asm("r0");
-
-            __asm__ __volatile__ (
-                "mov r7, #0x8\n\t"
-                "swi #0x0"
-                : "=r" (result)
-                : : "r7"
-            );
-            return result;
         #endif
     #elif defined(__linux__)
         /*
@@ -490,11 +484,31 @@ int ish_creat(const char *path, unsigned int mode)
             AT_FDCWD (-100) to simulate the work of `creat`.
         */
         #if defined(__aarch64__)
+            register long result asm("x0");
 
-            return -1;
+            __asm__ __volatile__ (
+                "mov x0, $-100\n\t"
+                "mov x1, $0\n\t"
+                "mov x2, $1\n\t"
+                "mov x8, #0x8\n\t"
+                "svc #0x0"
+                : "=r" (result)
+                : : "x8", "x0", "x1", "x2"
+            );
+            return result;
         #elif defined(__arm__)
+            register long result asm("r0");
 
-            return -1;
+            __asm__ __volatile__ (
+                "mov r0, $-100\n\t"
+                "mov r1, $0\n\t"
+                "mov r2, $1\n\t"
+                "mov r7, #0x8\n\t"
+                "swi #0x0"
+                : "=r" (result)
+                : : "r7", "r0", "r1", "r2"
+            );
+            return result;
         #endif
     #endif
 #else
@@ -541,7 +555,7 @@ int ish_dup2(int old_file_descriptor, int new_file_descriptor)
             register long result asm("x0");
 
             __asm__ __volatile__ (
-                "mov x8, #0x3f\n\t"
+                "mov x8, #0x166\n\t"
                 "svc #0x0"
                 : "=r" (result)
                 : : "x8"
@@ -551,7 +565,7 @@ int ish_dup2(int old_file_descriptor, int new_file_descriptor)
             register long result asm("r0");
 
             __asm__ __volatile__ (
-                "mov r7, #0x3f\n\t"
+                "mov r7, #0x166\n\t"
                 "swi #0x0"
                 : "=r" (result)
                 : : "r7"
@@ -660,6 +674,9 @@ int ish_fork()
             register long result asm("x0");
 
             __asm__ __volatile__ (
+                "mov x0, $17\n\t"
+                "mov x1, $0\n\t"
+                "mov x2, $1\n\t"
                 "mov x8, #0x2\n\t"
                 "svc #0x0"
                 : "=r" (result)
@@ -670,10 +687,13 @@ int ish_fork()
             register long result asm("r0");
 
             __asm__ __volatile__ (
+                "mov r0, $17\n\t"
+                "mov r1, $0\n\t"
+                "mov r2, $1\n\t"
                 "mov r7, #0x2\n\t"
                 "swi #0x0"
                 : "=r" (result)
-                : : "r7"
+                : : "r7", "r0", "r1", "r2"
             );
             return result;
         #endif
